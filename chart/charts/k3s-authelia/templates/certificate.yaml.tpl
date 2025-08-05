@@ -17,17 +17,17 @@ metadata:
   {{- end }}
 spec:
   secretStoreRef:
-    kind: {{ .Values.ingress.externalSecret.secretStoreType | quote }}
-    name: {{ .Values.ingress.externalSecret.secretStore | quote }}
+    kind: {{ .Values.externalCert.secretStoreType | quote }}
+    name: {{ .Values.externalCert.secretStore | quote }}
   target:
     creationPolicy: Owner
   data:
     - secretKey: tls.crt
       remoteRef:
-        key: {{ .Values.ingress.externalSecret.secretName | quote }}
+        key: {{ .Values.externalCert.secretName | quote }}
         property: tls_crt
     - secretKey: tls.key
       remoteRef:
-        key: {{ .Values.ingress.externalSecret.secretName | quote }}
+        key: {{ .Values.externalCert.secretName | quote }}
         property: tls_key
 {{- end }}{{- end }}
