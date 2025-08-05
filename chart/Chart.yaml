@@ -6,7 +6,9 @@ version: "0.0.1"
 dependencies:
 - name: k3s-authelia
   version: "0.0.1"
+  repository: file://./charts/k3s-authelia
   condition: k3s-authelia.enabled
 - name: k3s-openldap
   version: "0.0.1"
+  repository: file://./charts/k3s-openldap
   condition: k3s-openldap.enabled

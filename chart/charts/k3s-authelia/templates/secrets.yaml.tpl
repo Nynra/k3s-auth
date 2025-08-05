@@ -7,8 +7,8 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "1"
     # Global annotations
-    {{- if .Values.namespace.commonAnnotations }}
-    {{- toYaml .Values.namespace.commonAnnotations | nindent 4 }}
+    {{- if .Values.global.commonAnnotations }}
+    {{- toYaml .Values.global.commonAnnotations | nindent 4 }}
     {{- end }}
   {{- if .Values.global.commonLabels }}  
   labels:

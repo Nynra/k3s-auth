@@ -15,7 +15,7 @@ metadata:
   {{- end }}
 spec:
   forwardAuth:
-    address: 'http://authelia.{{ .Values.namespace.name }}.svc.cluster.local/api/authz/forward-auth'
+    address: 'http://authelia.{{ .Release.Namespace }}.svc.cluster.local/api/authz/forward-auth'
     authResponseHeaders:
       - 'Remote-User'
       - 'Remote-Groups'

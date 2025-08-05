@@ -1,5 +1,5 @@
 apiVersion: v2
-name: openldapApp
+name: k3s-openldap
 description: A Helm chart that deploys the OpenLDAP application.
 type: application
 version: "0.0.1"
