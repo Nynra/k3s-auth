@@ -1,0 +1,9 @@
+dependencies:
+- name: k3s-authelia
+  repository: ""
+  version: 0.0.1
+- name: k3s-openldap
+  repository: ""
+  version: 0.0.1
+digest: sha256:95fa278d1e2bcd6a296e1fc5b0eaa49c7957201da57cbb962a7addaf76d1dc88
+generated: "2025-08-05T19:54:42.769096566+02:00"
