@@ -1,0 +1,10 @@
+apiVersion: v2
+name: openldapApp
+description: A Helm chart that deploys the OpenLDAP application.
+type: application
+version: "0.0.1"
+dependencies:
+- name: openldap-stack-ha
+  version: "4.3.3"
+  repository: https://jp-gouin.github.io/helm-openldap/
+  condition: enabled

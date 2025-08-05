@@ -1,0 +1,10 @@
+apiVersion: v2
+name: autheliaChart
+description: A Helm chart that deploys the Authelia application.
+type: application
+version: "0.0.1"
+dependencies:
+- name: authelia
+  version: "0.10.41"
+  repository: https://charts.authelia.com
+  condition: authelia.enabled

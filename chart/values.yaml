@@ -1,0 +1,550 @@
+global:
+  global:
+  # Common labels to apply to all resources.
+  commonLabels: {}
+  # Common annotations to apply to all resources.
+  commonAnnotations: {}
+  # OpenLdap stack settings
+  ldapDomain: "example.com"
+
+k3s-openldap:
+  enabled: true
+
+  # External secret used to populate the global.existingSecret.
+  externalSecret:
+    enabled: true
+    secretName: ""
+    secretStore: "kubernetes"
+    secretStoreType: "ClusterSecretStore"
+    # Properties of the secretName secret in which the LDAP credentials are stored.
+    properties:
+      ldapAdmin: ""
+      ldapConfig: ""
+      ldapClient: ""
+
+  # phpldapadmin Ingress settings.
+  ldapAdminIngress:
+    enabled: false
+    ingressUrl: "ldap.example.com"
+    entrypoint: websecure
+    externalSecret:
+      enabled: false
+      secretName: ""
+      secretStore: kubernetes
+      secretStoreType: ClusterSecretStore
+
+  # ltb-passwd Ingress settings.
+  ltbIngress:
+    enabled: false
+    ingressUrl: "ltb.example.com"
+    entrypoint: websecure
+    externalSecret:
+      enabled: false
+      secretName: ""
+      secretStore: kubernetes
+      secretStoreType: ClusterSecretStore
+  
+  openldap-stack-ha: 
+    # Schemas to initialise the 'LDAP_EXTRA_SCHEMAS' env var
+    initialSchema: "cosine,inetorgperson,nis"
+
+    ## Persist data to a persistent volume
+    persistence:
+      enabled: true
+      size: 8Gi
+
+    # OPENLDAP resource requests and limits
+    resources:
+      limits: {}
+      requests: {}
+
+    # ltb-passwd settings.
+    ltb-passwd:
+      enabled: true
+
+    # phpldapadmin settings.
+    phpldapadmin:
+      enabled: true
+
+k3s-authelia:
+  enabled: true
+
+  # Ingress settings for the Authelia application.
+  externalCert:
+    enabled: false
+    secretName: ""
+    secretStore: kubernetes
+    secretStoreType: ClusterSecretStore
+
+  # The secret authelia uses to store sensitive information.
+  # if disabled the user has to provide the secrets in the authelia configmap.
+  externalSecrets:
+    enabled: true
+
+    secretStore: kubernetes
+    secretStoreType: ClusterSecretStore
+
+    authelia:
+      secretName: AutheliaSecrets
+      properties:
+        # Authelia secrets
+        jwt: ""
+        oidcHmac: ""
+        oidcIssuer: ""
+        session: ""
+        storage: ""
+        storageEncryption: ""
+        # reset: ""
+
+        # Optional if redis is used.
+        redis: ""
+        redisSentinel: ""
+
+    smtp:
+      secretName: SmtpSecrets
+      properties:
+        smtpPassword: ""
+
+    ldap:
+      secretName: AutheliaSecrets
+      properties:
+        ldapPassword: ""
+
+  authelia: 
+    enabled: true
+
+    ingress:
+      traefikCRD:
+        enabled: true 
+        entryPoints:
+          - websecure
+
+    pod:
+      resources:
+      # Resource Limits.
+      limits: {}
+      # limits:
+      #   cpu: '4.00'
+      #   memory: '125Mi'
+
+      # Resource Requests.
+      requests: {}
+      # requests:
+      #   cpu: '0.25'
+      #   memory: '50Mi'
+
+    configMap:
+      definitions:
+        network:
+          devNetwork:
+            # 192.168.0.0 - 192.168.7.255
+            - '192.168.0.0/21'
+        user_attributes: {}
+      
+      telemetry:
+        metrics:
+          enabled: true
+          serviceMonitor:
+            enabled: false
+      
+      # Set the default 2FA method for new users and for when a user has a preferred method configured that has been
+      # disabled. This setting must be a method that is enabled.
+      # Options are totp, webauthn, mobile_push.
+      default_2fa_method: ''
+
+      # Theme name to use for the frontend.
+      theme: 'light'
+
+      totp:
+        # The issuer name displayed in the Authenticator application of your choice.
+        # Defaults to 'Authelia'.
+        issuer: 'Authelia'
+
+      webauthn:
+        # Enabled Passkey Logins.
+        enable_passkey_login: false
+
+        # The display name the browser should show the user for when using Webauthn to login/register.
+        display_name: 'Authelia'
+
+      authentication_backend:
+        password_reset:
+          # External reset password url that redirects the user to an external reset portal. This disables the internal
+          # reset functionality. This should be the ltb project or similar.
+          custom_url: 'reset.example.com'
+
+        ldap:
+          enabled: false
+
+          tls:
+            # The server subject name to check the servers certificate against during the validation process.
+            # This option is not required if the certificate has a SAN which matches the host portion of the url option.
+            server_name: ''
+
+            # Skip verifying the server certificate entirely.
+            skip_verify: false
+
+          # The address for the ldap server. Format: <scheme>://<address>[:<port>].
+          # Scheme can be ldap or ldaps in the format (port optional).
+          address: 'ldaps://openldap.{{ .Release.Namespace }}.svc.cluster.local:636'
+
+          # The base dn for every LDAP query.
+          base_dn: ''
+          # An additional dn to define the scope to all users.
+          additional_users_dn: ''
+          # The users filter used in search queries to find the user profile based on input filled in login form.
+          users_filter: ''
+          # An additional dn to define the scope of groups.
+          additional_groups_dn: ''
+          # The groups filter used in search queries to find the groups of the user.
+          groups_filter: ''
+          # The username of the admin user.
+          user: 'cn=authelia,dc=example,dc=com'
+
+          attributes:
+            # The attribute holding the distinguished name of the user.
+            distinguished_name: ''
+            # The attribute holding the username of the user. This attribute is used to populate the username in the session
+            # information.
+            username: ''
+            # The attribute holding the display name of the user. This will be used to greet an authenticated user.
+            display_name: ''
+            # The attribute holding the family name of the user.
+            family_name: ''
+            # The attribute holding the given name of the user.
+            given_name: ''
+            # The attribute holding the middle name of the user.
+            middle_name: ''
+            # The attribute holding the nickname of the user.
+            nickname: ''
+            # The attribute holding the zoneinfo of the user.
+            zoneinfo: ''
+            # The attribute holding the locale of the user.
+            locale: ''
+            # The attribute holding the phone number of the user.
+            phone_number: ''
+            # The attribute holding the phone extension of the user.
+            phone_extension: ''
+            # The attribute holding the mail address of the user. If multiple email addresses are defined for a user, only the
+            # first one returned by the LDAP server is used.
+            mail: ''
+            # The attribute which represents the objects this user is a member of.
+            member_of: ''
+            # The attribute holding the name of the group.
+            group_name: ''
+      
+      password_policy: 
+        standard:
+          # Enables standard password policy.
+          enabled: false
+          # Require a minimum length for passwords.
+          min_length: 8
+          # Require a maximum length for passwords.
+          max_length: 0
+          # Require uppercase characters.
+          require_uppercase: false
+          # Require lowercase characters.
+          require_lowercase: false
+          # Require numeric characters.
+          require_number: false
+          # Require special characters.
+          require_special: false
+
+        ## zxcvbn is a well known and used password strength algorithm. It does not have tunable settings.
+        zxcvbn:
+          # Enables zxcvbn password policy.
+          enabled: false
+          # Configures the minimum score allowed.
+          min_score: 0
+
+      access_control:
+        # Default policy can either be 'bypass', 'one_factor', 'two_factor' or 'deny'. It is the policy applied to any
+        # resource if there is no policy to be applied to the user.
+        default_policy: 'deny'
+
+        # Access Control Rule list.
+        # Rules are matched in order and the first matching rule is applied.
+        # If no rules match, the default policy is applied.
+        rules: []
+        # rules:
+        # - domain_regex: '^.*\.example.com$'
+        #   policy: 'bypass'
+        # - domain: 'public.example.com'
+        #   policy: 'bypass'
+        # - domain: '*.example.com'
+        #   policy: 'bypass'
+        #   methods:
+        #   - 'OPTIONS'
+        # - domain: 'secure.example.com'
+        #   policy: 'one_factor'
+        #   networks:
+        #   - 'private'
+        #   - 'vpn'
+        #   - '192.168.1.0/24'
+        #   - '10.0.0.1'
+        # - domain:
+        #   - 'secure.example.com'
+        #   - 'private.example.com'
+        #   policy: 'two_factor'
+        # - domain: 'singlefactor.example.com'
+        #   policy: 'one_factor'
+        # - domain: 'mx2.mail.example.com'
+        #   subject: 'group:admins'
+        #   policy: 'deny'
+        # - domain: '*.example.com'
+        #   subject:
+        #   - 'group:admins'
+        #   - 'group:moderators'
+        #   policy: 'two_factor'
+        # - domain: 'dev.example.com'
+        #   resources:
+        #   - '^/groups/dev/.*$'
+        #   subject: 'group:dev'
+        #   policy: 'two_factor'
+        # - domain: 'dev.example.com'
+        #   resources:
+        #   - '^/users/john/.*$'
+        #   subject:
+        #   - ['group:dev', 'user:john']
+        #   - 'group:admins'
+        #   policy: 'two_factor'
+        # - domain: '{user}.example.com'
+        #   policy: 'bypass'
+      session: 
+        # The name of the session cookie. (default: authelia_session).
+        name: 'authelia_session'
+        # Sets the Cookie SameSite value. Possible options are none, lax, or strict.
+        # Please read https://www.authelia.com/configuration/session/introduction/#same_site
+        same_site: 'lax'
+        # The time before the cookie expires and session is reset.
+        expiration: '1 hour'
+        # The inactivity time before the session is reset.
+        inactivity: '5 minutes'
+        # The remember me duration.
+        remember_me: '1 month'
+
+        cookies: []
+        # cookies:
+        # -
+          ## The subdomain to prefix the domain with. For example using `domain` value `example.com` and `subdomain`
+          ## `auth` should yield the URL `https://auth.example.com`. This option does not affect the cookie domain.
+          # subdomain: 'auth'
+
+          ## The domain for cookie and to build the Authelia URL.
+          # domain: ''
+
+          ## The path to suffix the domain with. For example using `domain` value `example.com` and `subdomain` value
+          ## `auth` and `path` value `auth` should yield the URL `https://auth.example.com/auth`.
+          ## This option does not affect the cookie domain.
+          # path: ''
+
+          ## Default Redirection URL for this domain when there is no forwarding application.
+          # default_redirection_url: ''
+
+          ## Cookie Name override for this individual cookie. Otherwise, uses the default value above where
+          ## more descriptive information about this value exists.
+          # name: ''
+
+          ## Cookie Same Site value override for this individual cookie. Otherwise, uses the default value above where
+          ## more descriptive information about this value exists.
+          # same_site: ''
+
+          ## Cookie Expiration value override for this individual cookie. Otherwise, uses the default value above where
+          ## more descriptive information about this value exists.
+          # expiration: ''
+
+          ## Cookie Inactivity value override for this individual cookie. Otherwise, uses the default value above where
+          ## more descriptive information about this value exists.
+          # inactivity: ''
+
+          ## Cookie Remember Me value override for this individual cookie. Otherwise, uses the default value above where
+          ## more descriptive information about this value exists.
+          # inactivity: ''
+        redis:
+          enabled: false
+          deploy: false
+      
+      regulation:
+        # The regulation modes to use. The active modes determines what is banned in the event of a regulation ban being
+        # triggered as well as what logs to inspect to determine if a ban is needed. Default is just user, but ip is also
+        # available.
+        modes:
+          - 'user'
+        # The number of failed login attempts before user is banned. Set it to 0 to disable regulation.
+        max_retries: 3
+        # The time range during which the user can attempt login before being banned. The user is banned if the
+        # authentication failed 'max_retries' times in a 'find_time' window. Find Time accepts duration notation.
+        # See: https://www.authelia.com/configuration/prologue/common/#duration-notation-format
+        find_time: '2 minutes'
+        # The length of time before a banned user can login again. Ban Time accepts duration notation.
+        # See: https://www.authelia.com/configuration/prologue/common/#duration-notation-format
+        ban_time: '5 minutes'
+
+      notifier:
+        # You can disable the notifier startup check by setting this to true.
+        disable_startup_check: false
+
+        smtp:
+          # Enables the SMTP Provider (Notifier).
+          enabled: false
+          # The sender is used to construct both the SMTP command MAIL FROM and to add the FROM header. This address must
+          # be in RFC5322 format.
+          sender: 'Authelia <admin@example.com>'
+          # HELO/EHLO Identifier. Some SMTP Servers may reject the default of localhost.
+          identifier: 'localhost'
+          # Subject configuration of the emails sent.
+          # {title} is replaced by the text from the notifier
+          subject: '[Authelia] {title}'
+          # This address is used during the startup check to verify the email configuration is correct.
+          # It's not important what it is except if your email server only allows local delivery.
+          startup_check_address: 'test@authelia.com'
+          # Disables sending HTML formatted emails.
+          disable_html_emails: false
+          # By default we require some form of TLS. This disables this check though is not advised.
+          disable_require_tls: false
+          # Some SMTP servers ignore SMTP specifications and claim to support STARTTLS when they in fact do not. For
+          # security reasons Authelia refuses to send messages to these servers. This option disables this measure and is
+          # enabled AT YOUR OWN RISK.
+          disable_starttls: false
+          # The username sent for authentication with the SMTP server. Paired with the password.
+          username: ''
+
+          tls:
+            # The server subject name to check the servers certificate against during the validation process.
+            # This option is not required if the certificate has a SAN which matches the host option.
+            server_name: ''
+
+            # Skip verifying the server certificate entirely.
+            skip_verify: false
+
+      identity_providers:
+        oidc:
+          # Enables this in the config map. Currently in beta stage.
+          # See https://www.authelia.com/r/openid-connect/
+          enabled: false
+          lifespans:
+            # Default lifespan for Access Tokens.
+            access_token: '1 hour'
+            # Default lifespan for Refresh Tokens.
+            refresh_token: '1 hour and 30 minutes'
+            # Default lifespan for ID Tokens.
+            id_token: '1 hour'
+            # Default lifespan for Authorize Codes.
+            authorize_code: '1 minute'
+            # Default lifespan for Device Codes.
+            device_code: '10 minutes'
+
+          # Authorization Policies configuration.
+          authorization_policies: {}
+          # authorization_policies:
+          #   policy_name:
+          #     default_policy: 'deny'
+          #     rules:
+          #       - policy: 'two_factor'
+          #         subject: 'user:abc'
+
+          # The JWK's issuer option configures multiple JSON Web Keys. It's required that at least one of the JWK's
+          # configured has the RS256 algorithm. For RSA keys (RS or PS) the minimum is a 2048 bit key.
+          jwks: []
+          # jwks:
+          #   - key_id: ''
+          #     algorithm: 'RS256'
+          #     use: 'sig'
+          #     key:
+          #       value: |
+          #         abc
+          #         123
+          #       path: '/secrets/oidc.jwk.RS256.pem'
+          #     certificate_chain:
+          #       path: '/secrets.oidc.jwk.RS256.crt'
+              
+          # List of registered clients for this provider.
+          clients: []
+          # clients:
+            # -
+              ## The ID is the OpenID Connect ClientID which is used to link an application to a configuration.
+              # client_id: 'myapp'
+
+              ## The description to show to users when they end up on the consent screen. Defaults to the ID above.
+              # client_name: 'My Application'
+
+              ## The client secret is a shared secret between Authelia and the consumer of this client.
+              # client_secret:
+                # value: '$plaintext$apple123'
+                # path: '/secrets/oidc.client.myapp.value'
+
+              ## Sector Identifiers are occasionally used to generate pairwise subject identifiers. In most cases this is not
+              ## necessary. Read the documentation for more information.
+              ## The subject identifier must be the host component of a URL, which is a domain name with an optional port.
+              # sector_identifier_uri: 'example.com'
+
+              ## Sets the client to public. This should typically not be set, please see the documentation for usage.
+              # public: false
+
+              ## Redirect URI's specifies a list of valid case-sensitive callbacks for this client.
+              # redirect_uris:
+              #   - 'https://oidc.example.com/oauth2/callback'
+
+              ## Request URI's specifies a list of valid case-sensitive URIs this client can ask Authelia to obtain a
+              ## Request Object from.
+              # request_uris:
+              #   - 'https://oidc.example.com/oauth2/request-object/authelia.jwk'
+
+              ## Audience this client is allowed to request.
+              # audience: []
+
+              ## Scopes this client is allowed to request.
+              # scopes:
+              #   - 'openid'
+              #   - 'profile'
+              #   - 'email'
+              #   - 'groups'
+
+              ## Grant Types configures which grants this client can obtain.
+              ## It's not recommended to configure this unless you know what you're doing.
+              # grant_types:
+              #   - 'refresh_token'
+              #   - 'authorization_code'
+
+              ## Response Types configures which responses this client can be sent.
+              ## It's not recommended to configure this unless you know what you're doing.
+              # response_types:
+              #   - 'code'
+
+              ## Response Modes configures which response modes this client supports.
+              ## It's not recommended to configure this unless you know what you're doing.
+              # response_modes:
+              #   - 'form_post'
+              #   - 'query'
+              #   - 'fragment'
+
+              ## The policy to require for this client; one_factor or two_factor.
+              # authorization_policy: 'two_factor'
+
+              # lifespan: ''
+
+              # claims_policy: ''
+
+              # requested_audience_mode: ''
+
+              ## The consent mode controls how consent is obtained.
+              # consent_mode: 'auto'
+
+              ## This value controls the duration a consent on this client remains remembered when the consent mode is
+              ## configured as 'auto' or 'pre-configured'.
+              # pre_configured_consent_duration: '30 days'
+
+              # require_pushed_authorization_requests: false
+              # require_pkce: false
+              # pkce_challenge_method: 'S256'
+
+
+
+
+
+
+
+
+
+
+              
