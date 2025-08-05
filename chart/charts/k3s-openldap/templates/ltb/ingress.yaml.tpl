@@ -3,12 +3,12 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: ltb-ingress
-  namespace: {{ .Values.namespace.name | quote }}
+  namespace: {{ .Release.Namespace | quote }}
   annotations:
     kubernetes.io/ingress.class: traefik-external
     # Global annotations
-    {{- if .Values.namespace.commonAnnotations }}
-    {{- toYaml .Values.namespace.commonAnnotations | nindent 4 }}
+    {{- if .Values.global.commonAnnotations }}
+    {{- toYaml .Values.global.commonAnnotations | nindent 4 }}
     {{- end }}
   {{- if .Values.global.commonLabels }}  
   labels:

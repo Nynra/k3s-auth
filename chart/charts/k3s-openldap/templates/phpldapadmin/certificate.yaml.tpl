@@ -4,7 +4,7 @@ apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: "phpmyldapadmin-tls"
-  namespace: {{ .Values.namespace.name | quote }}
+  namespace: {{ .Release.Namespace | quote }}
   annotations:
     argocd.argoproj.io/sync-wave: "-4"
     # Global annotations
