@@ -54,6 +54,7 @@ ltbIngress:
 
 # Helm values for the openldap stack.
 openldap-stack-ha:
+  enabled: true
   clusterDomain: "cluster.local"
 
   # Schemas are not replicated, so make sure every schemas are defined in customSchemaFiles

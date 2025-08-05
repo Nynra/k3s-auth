@@ -3,4 +3,4 @@ dependencies:
   repository: https://charts.authelia.com
   version: 0.10.41
 digest: sha256:45815cc535eee255577955e1576f7a8d01b5135b3bfbd6f461baa05a03608f77
-generated: "2025-08-05T20:48:30.866901238+02:00"
+generated: "2025-08-05T21:13:23.891710779+02:00"

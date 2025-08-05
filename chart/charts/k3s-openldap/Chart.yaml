@@ -7,4 +7,4 @@ dependencies:
 - name: openldap-stack-ha
   version: "4.3.3"
   repository: https://jp-gouin.github.io/helm-openldap/
-  condition: enabled
+  condition: openldap-stack-ha.enabled
