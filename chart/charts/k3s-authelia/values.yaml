@@ -349,7 +349,7 @@ authelia:
         # The address for the ldap server. Format: <scheme>://<address>[:<port>].
         # service-name.namespace.svc.cluster.local
         # Scheme can be ldap or ldaps in the format (port optional).
-        address: 'ldaps://openldap.authelia-system.svc.cluster.local:636'
+        address: 'ldaps://openldap.{{ .Release.Namespace }}.svc.cluster.local:636'
 
         # Use StartTLS with the LDAP connection.
         start_tls: false
