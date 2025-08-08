@@ -51,7 +51,7 @@ k3s-openldap:
     ## Persist data to a persistent volume
     persistence:
       enabled: true
-      size: 8Gi
+      size: 2Gi
 
     # OPENLDAP resource requests and limits
     resources:

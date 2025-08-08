@@ -201,7 +201,7 @@ openldap-stack-ha:
     # existingClaim: openldap-pvc
     accessModes:
       - ReadWriteOnce
-    size: 8Gi
+    size: 2Gi
     storageClass: ""
 
   ## OPENLDAP  resource requests and limits
