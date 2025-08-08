@@ -26,6 +26,9 @@ k3s-openldap:
   ldapAdminIngress:
     enabled: false
     ingressUrl: "ldap.example.com"
+    middlewares: 
+      - name: traefik-default-chain
+        namespace: traefik
     entrypoint: websecure
     externalSecret:
       enabled: false
@@ -37,6 +40,9 @@ k3s-openldap:
   ltbIngress:
     enabled: false
     ingressUrl: "ltb.example.com"
+    middlewares: 
+      - name: traefik-default-chain
+        namespace: traefik
     entrypoint: websecure
     externalSecret:
       enabled: false

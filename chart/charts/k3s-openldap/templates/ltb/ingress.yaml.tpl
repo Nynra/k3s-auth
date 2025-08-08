@@ -21,6 +21,15 @@ spec:
   routes:
     - match: Host(`{{ .Values.ltbIngress.ingressUrl }}`)
       kind: Rule
+      {{- if .Values.ltbIngress.middlewares }}
+      middlewares:
+        {{- range .Values.ltbIngress.middlewares }}
+        - name: {{ .name | quote }}
+          {{- if .namespace }}
+          namespace: {{ .namespace | quote }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
       services:
         - name: ltb-passwd
           port: http

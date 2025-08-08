@@ -21,6 +21,15 @@ spec:
   routes:
     - match: Host(`{{ .Values.ldapAdminIngress.ingressUrl }}`)
       kind: Rule
+      {{- if .Values.ldapAdminIngress.middlewares }}
+      middlewares:
+        {{- range .Values.ldapAdminIngress.middlewares }}
+        - name: {{ .name | quote }}
+          {{- if .namespace }}
+          namespace: {{ .namespace | quote }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
       services:
         - name: phpldapadmin
           port: http

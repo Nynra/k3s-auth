@@ -34,6 +34,9 @@ externalSecret:
 ldapAdminIngress:
   enabled: false
   ingressUrl: "ldap.example.com"
+  middlewares: 
+    - name: traefik-default-chain
+      namespace: traefik
   entrypoint: websecure
   externalSecret:
     enabled: false
@@ -45,6 +48,9 @@ ldapAdminIngress:
 ltbIngress:
   enabled: false
   ingressUrl: "ltb.example.com"
+  middlewares: 
+    - name: traefik-default-chain
+      namespace: traefik
   entrypoint: websecure
   externalSecret:
     enabled: false
