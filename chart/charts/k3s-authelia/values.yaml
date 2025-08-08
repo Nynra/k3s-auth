@@ -637,7 +637,7 @@ authelia:
 
       local:
         # Enable the Local Provider (Storage / SQL)
-        enabled: false
+        enabled: true
 
     notifier:
       # You can disable the notifier startup check by setting this to true.
