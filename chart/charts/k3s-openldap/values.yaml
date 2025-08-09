@@ -271,4 +271,4 @@ openldap-stack-ha:
   ## phpldapadmin
   ## For more parameters check following file: ./charts/phpldapadmin/values.yaml
   phpldapadmin:
-    enabled: false
+    enabled: true
