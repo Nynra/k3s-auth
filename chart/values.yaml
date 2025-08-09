@@ -37,9 +37,6 @@ k3s-openldap:
       secretStoreType: ClusterSecretStore
   
   openldap-stack-ha: 
-    # Schemas to initialise the 'LDAP_EXTRA_SCHEMAS' env var
-    initialSchema: "cosine,inetorgperson,nis"
-
     ## Persist data to a persistent volume
     persistence:
       enabled: true
