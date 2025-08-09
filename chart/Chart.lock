@@ -6,4 +6,4 @@ dependencies:
   repository: file://./charts/k3s-openldap
   version: 0.0.1
 digest: sha256:d6c623144d4c649bd997aa19e2951ea904ee0918a46712545dcc28b317d1cfaa
-generated: "2025-08-05T20:08:53.129840394+02:00"
+generated: "2025-08-09T18:39:24.147583783+02:00"
