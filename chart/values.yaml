@@ -37,18 +37,18 @@ k3s-openldap:
       secretStoreType: ClusterSecretStore
 
   # ltb-passwd Ingress settings.
-  ltbIngress:
-    enabled: false
-    ingressUrl: "ltb.example.com"
-    middlewares: 
-      - name: traefik-default-chain
-        namespace: traefik
-    entrypoint: websecure
-    externalSecret:
-      enabled: false
-      secretName: ""
-      secretStore: kubernetes
-      secretStoreType: ClusterSecretStore
+  # ltbIngress:
+  #   enabled: false
+  #   ingressUrl: "ltb.example.com"
+  #   middlewares: 
+  #     - name: traefik-default-chain
+  #       namespace: traefik
+  #   entrypoint: websecure
+  #   externalSecret:
+  #     enabled: false
+  #     secretName: ""
+  #     secretStore: kubernetes
+  #     secretStoreType: ClusterSecretStore
   
   openldap-stack-ha: 
     # Schemas to initialise the 'LDAP_EXTRA_SCHEMAS' env var
@@ -66,7 +66,7 @@ k3s-openldap:
 
     # ltb-passwd settings.
     ltb-passwd:
-      enabled: true
+      enabled: false
 
     # phpldapadmin settings.
     phpldapadmin:
