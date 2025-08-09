@@ -272,3 +272,5 @@ openldap-stack-ha:
   ## For more parameters check following file: ./charts/phpldapadmin/values.yaml
   phpldapadmin:
     enabled: true
+    ingress:
+      enabled: false
