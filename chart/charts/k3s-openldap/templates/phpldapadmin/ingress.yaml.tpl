@@ -31,7 +31,7 @@ spec:
         {{- end }}
       {{- end }}
       services:
-        - name: phpldapadmin
+        - name: "{{ .Release.Name }}-phpldapadmin"
           port: http
   tls:
     secretName: "phpmyldapadmin-tls"
