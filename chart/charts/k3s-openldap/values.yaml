@@ -332,6 +332,8 @@ openldap-stack-ha:
       enabled: false
     env:
       PHPLDAPADMIN_LDAP_CLIENT_TLS_REQCERT: "never"
+      PHPLDAPADMIN_LDAP_HOSTS: "openldap"
+      # PHPLDAPADMIN_LDAP_CLIENT_TLS: "true"
     # ldap:
       # if you want to restrict search base tree for users instead of complete domain
       # searchBase: "ou=....,dc=mydomain,dc=com"
