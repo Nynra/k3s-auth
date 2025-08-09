@@ -3,4 +3,4 @@ dependencies:
   repository: https://jp-gouin.github.io/helm-openldap/
   version: 4.3.3
 digest: sha256:838ccc1f55ca7468e50eb86bf90e3caaebab0c7d400a5af0386cde6129ab793f
-generated: "2025-08-09T18:39:18.9962203+02:00"
+generated: "2025-08-09T19:31:38.021980434+02:00"

@@ -62,16 +62,6 @@ ltbIngress:
     secretStore: kubernetes
     secretStoreType: ClusterSecretStore
 
-phpldapadmin:
-  enabled: true
-  workload:
-    main:
-      podSpec:
-        containers:
-          main:
-            env:
-              PHPLDAPADMIN_LDAP_HOSTS: "openldap"
-
 # Helm values for the openldap stack.
 openldap-stack-ha:
   enabled: true
@@ -81,11 +71,11 @@ openldap-stack-ha:
   replicaCount: 1
   readonlyReplicaCount: 0
 
-  # nameOverride String to partially override common.names.fullname
-  nameOverride: "openldap"
+  # # nameOverride String to partially override common.names.fullname
+  # nameOverride: "openldap"
 
-  # Do not change the name of the chart this will break the ingress
-  fullnameOverride: "openldap"
+  # # Do not change the name of the chart this will break the ingress
+  # fullnameOverride: "openldap"
 
   service: 
     annotations: {}

@@ -8,7 +8,3 @@ dependencies:
   version: "4.3.3"
   repository: https://jp-gouin.github.io/helm-openldap/
   condition: openldap-stack-ha.enabled
-- name: phpldapadmin
-  version: "16.2.1"
-  repository: oci://tccr.io/truecharts/phpldapadmin
-  condition: phpldapadmin.enabled
