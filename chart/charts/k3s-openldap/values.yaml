@@ -7,6 +7,10 @@ global:
   # OpenLdap stack settings
   ldapDomain: "example.com"
 
+  # Because im lazy and dont know how to parse strings in templates yet
+  ldapDomainNameOnly: "example"
+  ldapDomainExtension: "com"
+
   # Specifies an existing secret to be used for admin and config user passwords. 
   # for the helm-openldap chart.
   # DO NOT CHANGE THE NAME OF THIS SECRET UNLESS YOU KNOW WHAT YOU ARE DOING.
@@ -64,7 +68,7 @@ openldap-stack-ha:
   clusterDomain: "cluster.local"
 
   # Schemas are not replicated, so make sure every schemas are defined in customSchemaFiles
-  replicaCount: 3
+  replicaCount: 1
   readonlyReplicaCount: 0
 
   # Do not change the name of the chart this will break the ingress
@@ -103,9 +107,10 @@ openldap-stack-ha:
     LDAP_LOGLEVEL: "256"
     LDAP_REQUIRE_TLS: "false"
     LDAPTLS_REQCERT: "never"
-    LDAP_ENABLE_TLS: "yes"
-    LDAP_SKIP_DEFAULT_TREE: "no"
-    LDAP_ALLOW_ANON_BINDING: 'no'
+    LDAP_ENABLE_TLS: "true"
+    LDAP_SKIP_DEFAULT_TREE: "false"
+    LDAP_ALLOW_ANON_BINDING: 'false'
+    # LDAP_RFC2307BIS_SCHEMA: "true"
 
   # Pod Disruption Budget for Stateful Set
   # Disabled by default, to ensure backwards compatibility
@@ -115,70 +120,54 @@ openldap-stack-ha:
     maxUnavailable: ""
 
   # Schemas to initialise the 'LDAP_EXTRA_SCHEMAS' env var
-  initialSchema: "cosine,inetorgperson,nis"
+  # initialSchema: "cosine,inetorgperson"
+  initialSchemas: "cosine,rfc2307bis"
 
   # Custom openldap schema files used to be used in addition to default schemas
-  # Note that the supplied files are sorted by name and inserted into 'LDAP_EXTRA_SCHEMAS' env var
-  # after chart default schemas, allowing you to control the loading sequence.
-  # Note the admin user is created by the application and should not be added as a custom ldif
-  # All internal configuration like cn=config , cn=module{0},cn=config cannot be configured yet.
   # customSchemaFiles:
-  #   custom.ldif: |-
-  #     # custom schema
-  #   anothercustom.ldif: |-
-  #     # another custom schema
+  #   #enable memberOf ldap search functionality, users automagically track groups they belong to
+  #   00-memberof.ldif: |-
+  #     # Load memberof module
+  #     dn: cn=module,cn=config
+  #     cn: module
+  #     objectClass: olcModuleList
+  #     olcModuleLoad: memberof
+  #     olcModulePath: /opt/bitnami/openldap/lib/openldap
+
+  #     dn: olcOverlay=memberof,olcDatabase={2}mdb,cn=config
+  #     changetype: add
+  #     objectClass: olcOverlayConfig
+  #     objectClass: olcMemberOf
+  #     olcOverlay: memberof
+  #     olcMemberOfRefint: TRUE
 
   ## Existing configmap with custom ldif
-  # Can't be use with customLdifFiles
-  # Same format as customLdifFiles
-  # customLdifCm: my-custom-ldif-cm
-
-  # Custom openldap configuration files used to override default settings
-  # DO NOT FORGET to put the Root Organisation object as it won't be created while using customLdifFiles
-  # customLdifFiles:
-  #   00-root.ldif: |-
-  #     # Root creation
-  #     dn: dc=example,dc=org
-  #     objectClass: dcObject
-  #     objectClass: organization
-  #     o: Example, Inc
-  #   01-default-group.ldif: |-
-  #     dn: cn=myGroup,dc=example,dc=org
-  #     cn: myGroup
-  #     gidnumber: 500
-  #     objectclass: posixGroup
-  #     objectclass: top
-  #   02-default-user.ldif: |-
-  #     dn: cn=Jean Dupond,dc=example,dc=org
-  #     cn: Jean Dupond
-  #     gidnumber: 500
-  #     givenname: Jean
-  #     homedirectory: /home/users/jdupond
-  #     objectclass: inetOrgPerson
-  #     objectclass: posixAccount
-  #     objectclass: top
-  #     sn: Dupond
-  #     uid: jdupond
-  #     uidnumber: 1000
-  #     userpassword: {MD5}KOULhzfBhPTq9k7a9XfCGw==
+  customLdifCm: custom-ldif-cm
 
   # Custom openldap ACLs
-  # If not defined, the following default ACLs are applied:
-  # customAcls: |-
-  #   dn: olcDatabase={2}mdb,cn=config
-  #   changetype: modify
-  #   replace: olcAccess
-  #   olcAccess: {0}to *
-  #     by dn.exact=gidNumber=0+uidNumber=1001,cn=peercred,cn=external,cn=auth manage
-  #     by * break
-  #   olcAccess: {1}to attrs=userPassword,shadowLastChange
-  #     by self write
-  #     by dn="{{ include "global.bindDN" . }}" write
-  #     by anonymous auth by * none
-  #   olcAccess: {2}to *
-  #     by dn="{{ include "global.bindDN" . }}" write
-  #     by self read
-  #     by * none
+  # https://github.com/jp-gouin/helm-openldap/tree/master/advanced_examples
+  customAcls: |
+    dn: olcDatabase={2}mdb,cn=config
+    changetype: modify
+    replace: olcAccess
+    olcAccess: {0}to *
+      by dn.exact=gidNumber=0+uidNumber=1001,cn=peercred,cn=external,cn=auth manage
+      by * break
+    olcAccess: {1}to attrs=userPassword,shadowLastChange
+      by self write
+      by dn="cn=admin,dc={{ .Values.global.ldapDomainNameOnly }},dc={{ .Values.global.ldapDomainExtension }}" write
+      by anonymous auth by * none
+    olcAccess: {2}to *
+      by dn="cn=admin-read,dc={{ .Values.global.ldapDomainNameOnly }},dc={{ .Values.global.ldapDomainExtension }}" read
+      by dn="cn=admin,dc={{ .Values.global.ldapDomainNameOnly }},dc={{ .Values.global.ldapDomainExtension }}" write
+      by self read
+      by * none
+    olcAccess: {3}to dn.subtree="ou=users,dc={{ .Values.global.ldapDomainNameOnly }},dc={{ .Values.global.ldapDomainExtension }}"
+      by dn="cn=authenticator,ou=services,dc={{ .Values.global.ldapDomainNameOnly }},dc={{ .Values.global.ldapDomainExtension }}" read
+      by dn="cn=admin-read,dc={{ .Values.global.ldapDomainNameOnly }},dc={{ .Values.global.ldapDomainExtension }}" read
+      by dn="cn=admin,dc={{ .Values.global.ldapDomainNameOnly }},dc={{ .Values.global.ldapDomainExtension }}" write
+      by self read
+      by * none
 
   replication:
     enabled: true
@@ -195,7 +184,7 @@ openldap-stack-ha:
 
   ## Persist data to a persistent volume
   persistence:
-    enabled: true
+    enabled: false
     ## database data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -320,18 +309,18 @@ openldap-stack-ha:
   ## ltb-passwd
   # For more parameters check following file: ./charts/ltb-passwd/values.yaml
   ltb-passwd:
-    enabled : true
+    enabled : false
     # Static name for easier reference in other charts
-    fullnameOverride: "ltb-passwd"
-    ingress:
-      enabled: false
+    # fullnameOverride: "ltb-passwd"
+    # ingress:
+    #   enabled: false
     # ldap:
-      # if you want to restrict search base tree for users instead of complete domain
-      # searchBase: "ou=....,dc=mydomain,dc=com"
-      # if you want to use a dedicated bindDN for the search with less permissions instead of cn=admin one
-      # bindDN: "cn=....,dc=mydomain,dc=com"
-      # if you want to use a specific key of the credentials secret instead of the default one (LDAP_ADMIN_PASSWORD)
-      # passKey: LDAP_MY_KEY
+    #     ldap:
+    #       searchBase: "ou=users,dc={{ .Values.global.ldapDomainNameOnly }},dc={{ .Values.global.ldapDomainExtension }}"
+    #       # Ltb credentials
+    #       # https://github.com/jp-gouin/helm-openldap/tree/master/advanced_examples
+    #       bindDN: "cn=ltb,ou=services,dc={{ .Values.global.ldapDomainNameOnly }},dc={{ .Values.global.ldapDomainExtension }}"
+    #       passKey: LDAP_ADMIN_READ_PASSWORD
 
   ## phpldapadmin
   ## For more parameters check following file: ./charts/phpldapadmin/values.yaml

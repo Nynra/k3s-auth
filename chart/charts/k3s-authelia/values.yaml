@@ -330,18 +330,18 @@ authelia:
           secret_name: "my-authelia-secrets"
         
     authentication_backend:
-      password_reset:
-        # External reset password url that redirects the user to an external reset portal. This disables the internal
-        # reset functionality. This should be the ltb project or similar.
-        custom_url: 'https://reset.example.com'
+      # password_reset:
+      #   # External reset password url that redirects the user to an external reset portal. This disables the internal
+      #   # reset functionality. This should be the ltb project or similar.
+      #   custom_url: 'https://reset.example.com'
 
       # Disable the password change functionality as Authelia does not manage passwords in LDAP.
       password_change:
-        disable: true 
+        disable: false 
 
       ldap:
         # Enable LDAP Backend.
-        enabled: false
+        enabled: true
 
         # The LDAP implementation, this affects elements like the attribute utilised for resetting a password.
         implementation: 'custom'
@@ -360,7 +360,7 @@ authelia:
           server_name: ''
 
           # Skip verifying the server certificate entirely.
-          skip_verify: false
+          skip_verify: true
 
         # The base dn for every LDAP query.
         base_dn: ''
