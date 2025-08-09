@@ -39,7 +39,7 @@ k3s-openldap:
   openldap-stack-ha: 
     ## Persist data to a persistent volume
     persistence:
-      enabled: true
+      enabled: false
       size: 2Gi
 
     # OPENLDAP resource requests and limits
