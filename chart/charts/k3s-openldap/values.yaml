@@ -62,6 +62,16 @@ ltbIngress:
     secretStore: kubernetes
     secretStoreType: ClusterSecretStore
 
+phpldapadmin:
+  enabled: true
+  workload:
+    main:
+      podSpec:
+        containers:
+          main:
+            env:
+              PHPLDAPADMIN_LDAP_HOSTS: "openldap"
+
 # Helm values for the openldap stack.
 openldap-stack-ha:
   enabled: true
@@ -271,19 +281,4 @@ openldap-stack-ha:
   ## phpldapadmin
   ## For more parameters check following file: ./charts/phpldapadmin/values.yaml
   phpldapadmin:
-    enabled: true
-    # Static name for easier reference in other charts
-    fullnameOverride: "phpldapadmin"
-    ingress:
-      enabled: false
-    env:
-      PHPLDAPADMIN_LDAP_CLIENT_TLS_REQCERT: "never"
-      PHPLDAPADMIN_LDAP_HOSTS: "openldap"
-      # PHPLDAPADMIN_LDAP_CLIENT_TLS: "true"
-    # ldap:
-      # if you want to restrict search base tree for users instead of complete domain
-      # searchBase: "ou=....,dc=mydomain,dc=com"
-      # if you want to use a dedicated bindDN for the search with less permissions instead of cn=admin one
-      # bindDN: "cn=....,dc=mydomain,dc=com"
-      # if you want to use a specific key of the credentials secret instead of the default one (LDAP_ADMIN_PASSWORD)
-      # passKey: LDAP_MY_KEY
+    enabled: false
